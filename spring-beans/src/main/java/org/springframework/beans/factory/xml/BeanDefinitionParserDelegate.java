@@ -1427,17 +1427,22 @@ public class BeanDefinitionParserDelegate {
 	 * @param containingBd the containing bean definition (if any)
 	 * @return the resulting bean definition
 	 */
+	//containingBd为父类bean，对顶层元素的解析应设置为null
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		//获取对应的命名空间
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
 			return null;
 		}
+		//根据命名空间找到对应的NamespaceHandler
+		//在readerContext初始化的时候其属性namespaceHandlerResolver已经被初始化为了DefaultNamespaceHanderResolver的实例了
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		//调用自定义的NamespaceHandler
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 
