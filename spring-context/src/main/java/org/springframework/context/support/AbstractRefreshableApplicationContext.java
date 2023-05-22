@@ -19,6 +19,7 @@ package org.springframework.context.support;
 import java.io.IOException;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.QualifierAnnotationAutowireCandidateResolver;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -124,9 +125,14 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			closeBeanFactory();
 		}
 		try {
+			//创建DefaultListableBeanFactory
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
+			//为了序列化指定id，如果需要的话，让这个BeanFactory从id反序列化到BeanFactory对象
 			beanFactory.setSerializationId(getId());
+			//定制beanFactory，设置相关属性，包括是否语序覆盖同名称的不同定义的对象以及循环依赖
+			//以及设置@Autowired和@Qualifier注解解析器QualifierAnnotationAutowire-CandidateResolver
 			customizeBeanFactory(beanFactory);
+			//初始化DodumentReader，并进行XML文件读取及解析
 			loadBeanDefinitions(beanFactory);
 			this.beanFactory = beanFactory;
 		}
@@ -213,11 +219,15 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
 		if (this.allowBeanDefinitionOverriding != null) {
+			//是否允许覆盖同名称的不同定义的对象
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
 		if (this.allowCircularReferences != null) {
+			//是否允许bean之间存在循环依赖
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
+		//自己加的
+		beanFactory.setAutowireCandidateResolver(new QualifierAnnotationAutowireCandidateResolver());
 	}
 
 	/**

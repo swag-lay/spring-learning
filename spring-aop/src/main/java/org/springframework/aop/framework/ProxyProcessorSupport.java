@@ -105,6 +105,7 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 		Class<?>[] targetInterfaces = ClassUtils.getAllInterfacesForClass(beanClass, getProxyClassLoader());
 		boolean hasReasonableProxyInterface = false;
 		for (Class<?> ifc : targetInterfaces) {
+			//添加代理接口
 			if (!isConfigurationCallbackInterface(ifc) && !isInternalLanguageInterface(ifc) &&
 					ifc.getMethods().length > 0) {
 				hasReasonableProxyInterface = true;
